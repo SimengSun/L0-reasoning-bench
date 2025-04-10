@@ -1,0 +1,11 @@
+Please execute the following program by outputting a trace of the program execution. The trace should include the line number, the variable name and the updated value of the variable after executing that line. Please follow the examples below:
+
+{fewshots}
+Input:
+```
+function({function_args})
+```
+
+Please follow the format above and provide the program execution trace starting with ```L2,
+
+Output:

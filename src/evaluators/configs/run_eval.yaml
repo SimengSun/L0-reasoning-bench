@@ -1,0 +1,45 @@
+data: 
+  folder: /path/to/data         # path that contains 'data.jsonl' and the .bin files created by the generator
+  split: 1                      # split index (index_1.bin, index_2.bin, ... in the folder)
+  size: 50                      # number of problems to evaluate
+  prompt_file: default.txt      # path to the prompt file inside 'prompts' folder
+  fewshot_file: fewshots.jsonl  # path to the fewshot file inside the data folder
+  fewshot_pool_size: 64         # number of fewshot examples in the pool, this should be a number smaller than the `num_aug_inputs_per_program` specified in the generator config
+  num_fewshot: 4                # number of fewshot examples to use in the prompt
+  num_workers: 20               # number of workers to use (batch size)
+
+model:
+  model_name_or_path: "path/to/model" # path to a huggingface model or a local model
+  client_type: openai                 # openai, anthropic
+  max_seq_len: 32768                  # max sequence length
+  think: false                        # set to true to process <think> and </think> tags in the response
+  tp: 4                               # TP
+  pp: 1                               # PP
+  api_url: localhost                  # openai client
+  api_port: 5000                      # openai client
+  timeout: 5000                       # set a large number for long responses if needed, and when there are many pending requests
+  generation_kwargs:
+    top_p: 1e-6
+    top_k: 1
+    temperature: 0.0                  # vllm greedy
+    random_seed: 0
+    stop: ["<|end|>"]
+
+eval: 
+  root_folder: /path/to/L0-reasoning-bench/src
+  result_folder: /path/to/result
+  container_path: /path/to/sqsh/file/container.sqsh
+  cluster: local                          # local, slurm
+  client_sleep: 60                        # secs
+  num_voters_aggregate: [5, 15, 31]       # number of voters to aggregate results
+  num_voters_per_server: 4                # parallel client jobs for a single server
+  slurm_jobs: 8                           # only used when cluster is slurm
+  slurm_nodes: 1
+  slurm_account: slurm_account_name       # slurm account name
+  slurm_partition: slurm_partition_name  # slurm partition name
+  slurm_timeout: 04:00:00
+  slurm_mounts:
+    - /mnt:/mnt
+    - /home:/home
+
+

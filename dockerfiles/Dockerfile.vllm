@@ -1,0 +1,9 @@
+FROM nvcr.io/nvidia/pytorch:24.12-py3
+RUN pip install vllm==v0.6.6.post1
+RUN pip install openai
+RUN pip install tenacity
+RUN pip install tiktoken
+RUN pip install jsonlines
+RUN pip install anthropic
+RUN pip install -q -U google-generativeai
+WORKDIR /workspace/

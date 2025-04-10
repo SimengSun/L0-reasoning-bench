@@ -1,0 +1,22 @@
+actions: ["generate", "sample", "augment"]  # sequentially executable actions. select from ["generate", "sample", "augment"]
+output_path: /data/path/to/output           # path to save generated data
+grammar_ver: grammar_v0                     # grammar version, key specified in grammar.py    
+generate_limit: 2000                       # number of problems, i.e. (program,inputs,traces) triplets, to generate
+sample_bin_limit: 500                      # max number of problem ids each sample bin should contain
+num_bins: 2                                # number of bins to group generated problems by trace length
+max_expansion_depth: 100                    # max number of production rules expansion
+max_scope_depth: 1                          # max scope depth of the generate program
+num_inputs_per_program: 1                   # number of (input, trace) pairs per program
+num_aug_inputs_per_program: 32              # number of augmented (input, trace) pairs per program
+augment_test_only: True                     # whether to augment test programs only
+max_num: 10                                 # max integer value assigned to a terminal variable symbol
+max_list_len: 10                            # upper bound of a list length
+min_list_len: 5                             # lower bound of a list length
+max_code_lines: 20                          # max number of lines of code in a program
+min_code_lines: 10                          # min number of lines of code in a program
+max_while_loop: 100                         # max number of while loop steps in a program
+max_trace_steps: 100                        # max number of trace steps in a program
+random_seed: 42                             # random seed 
+num_processes: 32                           # number of processes to generate items
+overwritten_grammar: <stmt> ::= <list_op> | <assignment>  @@ <list_op> ::= <list_var> ".pop()" 
+overwritten_terminal: <bool_var> ::= cond_a | cond_b | cond_c  @@ <in_bool_var> ::= cond_o | cond_p | cond_q  @@ <var> ::= a | b | c | d | e | f  @@ <in_var> ::= o | p | q | r | s 

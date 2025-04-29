@@ -9,7 +9,7 @@ data:
   num_workers: 20               # number of workers to use (batch size)
 
 model:
-  model_name_or_path: "path/to/model" # path to a huggingface model or a local model
+  model_name_or_path: "path/to/model" # path to a huggingface model or a local model; set to "none" to get formatted prompt and target without running any model
   client_type: openai                 # openai, anthropic
   max_seq_len: 32768                  # max sequence length
   think: false                        # set to true to process <think> and </think> tags in the response

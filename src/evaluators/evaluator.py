@@ -1,3 +1,18 @@
+# Copyright (c) 2025 NVIDIA CORPORATION & AFFILIATES. All rights reserved.
+# SPDX-License-Identifier: Apache-2.0
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+# http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+
 import os
 import json
 import yaml
@@ -37,7 +52,7 @@ class Evaluator:
     ):  
 
         self.client = client
-        self.model_name = self.client.model_name.split("/")[-1].lower()
+        self.model_name = "none" if client is None else self.client.model_name.split("/")[-1].lower()
         self.tokenizer = tokenizer
         self.num_workers = num_workers  # batch size
         self.random_seed = random_seed
@@ -134,7 +149,8 @@ class Evaluator:
         del item["inputs"]
         del item["traces"]
         
-        if len(responses[0]) > 0:
+        # handle dummy None client which returns empty responses
+        if self.client is None or len(responses[0]) > 0:
             with open(os.path.join(self.output_dir, "logs.jsonl"), "a") as f:
                 f.write(json.dumps(item)+"\n")
         
@@ -170,6 +186,12 @@ class Evaluator:
                 test_input=inp,
                 few_shot_str=few_shot_str,
             )
+
+            # If client is None, we don't need to get actual responses
+            if self.client is None:
+                prompts.append(this_prompt)
+                responses.append("")  # Empty response when client is None
+                continue
 
             # get response
             max_toks_to_gen = len(self.tokenizer.encode("\n".join(trace[1:-1]))) + 200
@@ -353,9 +375,12 @@ if __name__ == "__main__":
     config.data.voter_id = args.voter_id
     config.data.prompt_file = os.path.join("prompts", config.data.prompt_file)
 
-    this_client = Client(
-        config=config.model,
-    )
+    if config.model.model_name_or_path == "none":
+        this_client = None
+    else:
+        this_client = Client(
+            config=config.model,
+        )
     
     try:
         this_tokenizer = AutoTokenizer.from_pretrained(config.model.model_name_or_path)

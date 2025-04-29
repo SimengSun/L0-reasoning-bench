@@ -12,7 +12,7 @@ The benchmark includes:
 
 We provide evaluation over a baseline set below.
 
-<details open>
+<details >
   <summary> Results on a baseline evaluation set (see `./example_data`) </summary>
 
 | **Model Name** | Thinking mode on | Steps to Err. ↑ (Single Attempt) | Steps to Err. ↑ (majvote @ 31) | Trace Acc. (%) (Single Attempt) | Trace Acc. (%) (majvote @ 31) | Trace Acc. (%) (pass @ 31) |
@@ -41,6 +41,8 @@ We provide evaluation over a baseline set below.
 | Meta-Llama-3.1-8B-Instruct    | N | 33.2  | 40.7  | 6.5  | 11.5 | 33.9 |
 | DeepSeek-R1-Distill-Qwen-7B | Y | 8.7   | 11.7  | 3.8  | 11.2 | 28.8 |
 </details>
+
+
 
 While we provide baseline results above, L0-Bench is designed as a flexible framework rather than a static leaderboard. We encourage practitioners to:
 - Generate custom test programs using the configurable yaml files
@@ -104,6 +106,8 @@ cd evaluators
 python launcher.py --config_file configs/run_eval.yaml
 ```
 
+Note: You can get the formatted prompts without running any model by setting the `model_name_or_path` to `"none"` in the yaml config file. 
+
 The launcher will create an evaluation folder named `run_eval` containing logs, results, and execution scripts. For each voter, the evaluator creates a client that sends formatted prompts to the server and stores model responses. Once all voters complete their evaluations, the aggregator performs majority voting and computes pass@k accuracy by combining results from all voters.
 
 ```
@@ -129,9 +133,10 @@ The launcher will create an evaluation folder named `run_eval` containing logs, 
 The `launcher.py` file will automatically create and run the scripts inside `./run_eval/scripts`. For majority voting, we run multiple voters in parallel using `evaluator.py` (via `run_slurm_job_eval_i.sh`) and then perform aggregation using `aggregator.py` (via `run_slurm_job_aggregate.sh`) to obtain the majority voted response.
 
 
+
 ## License
 
-To be updated.
+ Apache License 2.0
 
 ## Citation
 

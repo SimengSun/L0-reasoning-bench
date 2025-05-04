@@ -52,10 +52,12 @@ While we provide baseline results above, L0-Bench is designed as a flexible fram
 
 ## Environment
 
-We recommend using `Python 3.12.3` and Docker for consistent environment setup. 
+We recommend using `Python 3.12` and latest Docker listed below for consistent environment setup. 
+
+[UPDATE-2025-05] docker updated to support Qwen3
 
 ```
-docker pull simengs/l0-bench:v0.1
+docker pull simengs/l0-bench:v0.1.1
 ```
 
 To install dependencies manually, see `dockerfiles/requirements_v0.1.txt`

@@ -1,0 +1,21 @@
+actions: ["generate", "sample", "augment"]  # sequentially executable actions. select from ["generate", "sample", "augment"]
+output_path: /data/path/to/save/generated/data           # path to save generated data
+grammar_ver: grammar_v0                     # grammar version, key specified in grammar.py    
+generate_limit: 500000                       # number of problems, i.e. (program,inputs,traces) triplets, to generate
+sample_bin_limit: 2200                      # max number of problem ids each sample bin should contain
+num_bins: 10                                # number of bins to group generated problems by trace length
+max_expansion_depth: 200                    # max number of production rules expansion
+max_scope_depth: 1                          # max scope depth of the generate program
+num_inputs_per_program: 1                   # number of (input, trace) pairs per program
+num_aug_inputs_per_program: 1              # number of augmented (input, trace) pairs per program
+augment_test_only: False                     # whether to augment test programs only
+max_num: 10                                 # max integer value assigned to a terminal variable symbol
+max_list_len: 10                            # upper bound of a list length
+min_list_len: 5                             # lower bound of a list length
+max_code_lines: 50                          # max number of lines of code in a program
+min_code_lines: 20                          # min number of lines of code in a program
+max_while_loop: 50                         # max number of while loop steps in a program
+max_trace_steps: 150                        # max number of trace steps in a program
+random_seed: 42                             # random seed 
+num_processes: 32        
+overwritten_terminal: <bool_var> ::= cond_a | cond_b | cond_c | cond_d | cond_e | cond_f | cond_g | cond_h | cond_i | cond_j | cond_k | cond_l | cond_m | cond_n  @@ <in_bool_var> ::= cond_o | cond_p | cond_q | cond_r | cond_s | cond_t | cond_u | cond_v | cond_w | cond_x | cond_y | cond_z @@ <var> ::= a | b | c | d | e | f | g | h | i | j | k | l | m | n @@ <in_var> ::= o | p | q | r | s | t | u | v | w | x | y | z  @@ <lst_var> ::= lst_a | lst_b | lst_c | lst_d | lst_e | lst_f | lst_g | lst_h | lst_i | lst_j | lst_k | lst_l | lst_m | lst_n | lst_o | lst_p | lst_q | lst_r | lst_s | lst_t | lst_u | lst_v | lst_w | lst_x | lst_y | lst_z

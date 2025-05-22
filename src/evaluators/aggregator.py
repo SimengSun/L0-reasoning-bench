@@ -32,6 +32,9 @@ class TraceAnalysisResult:
     is_failed: bool         # failed when encountering an incorrect trace line
     total_traces: int       # total number of trace lines in the ground truth
     correct_traces: int     # number of consecutive correct trace lines from the start
+    target_trace_lines: List[str] = None  # target trace lines around error
+    model_trace_lines: List[str] = None   # model trace lines around error
+    program: str = None     # program being traced
 
 class TraceAnalyzer:
     """analyze model response against ground truth"""
@@ -48,16 +51,29 @@ class TraceAnalyzer:
         response = TraceAnalyzer._clean_response(item["responses"][0])
         if not response:
             print(f"Model did not provide valid trace for item {item['id']}")
-            return TraceAnalysisResult(True, total_traces, 0)
+            return TraceAnalysisResult(True, total_traces, 0, [], [], item.get("program", ""))
 
         response_lines = [x.strip() for x in response.split("\n") if x.strip()]
         response_lines = TraceAnalyzer._pad_response(response_lines, total_traces)
-        correct_traces = TraceAnalyzer._count_correct_traces(response_lines, trace_lines)
+        
+        # Find error position and collect surrounding lines
+        error_pos = TraceAnalyzer._count_correct_traces(response_lines, trace_lines)
+        target_error_lines = []
+        model_error_lines = []
+        
+        if error_pos < total_traces:
+            # get lines around the error line
+            start_idx = max(0, error_pos - 10)
+            target_error_lines = trace_lines[start_idx:error_pos + 1]
+            model_error_lines = response_lines[start_idx:error_pos + 1]
         
         return TraceAnalysisResult(
-            is_failed=correct_traces < total_traces,
+            is_failed=error_pos < total_traces,
             total_traces=total_traces,
-            correct_traces=correct_traces
+            correct_traces=error_pos,
+            target_trace_lines=target_error_lines,
+            model_trace_lines=model_error_lines,
+            program=item.get("program", "")
         )
 
     @staticmethod
@@ -97,6 +113,23 @@ class EvaluationAggregator:
         self.voter_sizes = voter_sizes
         self.analyzer = TraceAnalyzer()
 
+    def _save_error_info(self, data: List[List[Dict]], metrics: List[List[TraceAnalysisResult]], log_paths: List[str]):
+        """Save error information for each voter's folder"""
+        for voter_idx, log_path in enumerate(log_paths):
+            error_file = os.path.join(os.path.dirname(log_path), "errors.jsonl")
+            with jsonlines.open(error_file, "w") as f:
+                for item_group, metric_group in zip(data, metrics):
+                    item = item_group[voter_idx]
+                    metric = metric_group[voter_idx]
+                    
+                    error_info = {
+                        "id": item["id"],
+                        "tgt_trace_lines": metric.target_trace_lines,
+                        "model_trace_lines": metric.model_trace_lines,
+                        "program": metric.program
+                    }
+                    f.write(error_info)
+
     def evaluate(self, log_paths: List[str]):
         """
         evaluate model responses and aggregate results
@@ -117,6 +150,9 @@ class EvaluationAggregator:
         # metrics: List[List[TraceAnalysisResult]]
         metrics = self._analyze_traces(data)
 
+        # Save error information for each voter
+        self._save_error_info(data, metrics, log_paths)
+
         # generate summary
         # summary: str
         summary = self._generate_summary(metrics)
@@ -131,9 +167,7 @@ class EvaluationAggregator:
                 voted_metrics = self._analyze_traces(voted_data)
                 summary += f"\n### Majvote @ {voter_size}\n"
                 summary += self._generate_summary(voted_metrics)
-            log_folder = os.path.dirname(os.path.dirname(log_paths[0]))
-        else:
-            log_folder = os.path.dirname(log_paths[0]) 
+        log_folder = os.path.dirname(os.path.dirname(log_paths[0]))
 
         with open(os.path.join(log_folder, "res_eval.summary"), "w") as f:
             f.write(summary)
@@ -180,10 +214,13 @@ class EvaluationAggregator:
         
         summary = ""
         if len(metrics[0]) == 1:
-            summary += (
-                f"Whole-Trace Acc. : {np.round(np.sum(correct) / total, 4)}\n"
-                f"Steps-To-Err.: {np.round(np.mean(correct_lens), 2)}\n"
-            )
+            # print ground truth trace stats
+            summary += f"Total num of eval traces: {total}\n"
+            summary += f"Ground-Truth Trace steps: {np.round(np.mean(trace_lens), 2)}\n\n"
+
+            # average over all voters
+            summary += f"Single Attempt (Whole-Trace Acc.) Avg over {len(metrics[0])} voters: {np.round(np.array(correct).mean(axis=0).mean(), 4)}\n"
+            summary += f"Single Attempt (Steps-To-Err.) Avg over {len(metrics[0])} voters: {np.round(np.mean(correct_lens), 2)}\n"
         else:
             # print ground truth trace stats
             summary += f"Total num of eval traces: {total}\n"

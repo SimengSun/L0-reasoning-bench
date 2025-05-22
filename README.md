@@ -122,9 +122,11 @@ The launcher will create an evaluation folder named `run_eval` containing logs, 
 │   │   └── ...
 │   ├── results/                
 │   │   ├── voter_0/           
-│   │   │   └── logs.jsonl     # JSON Lines file containing voter 0's results
+│   │   │   ├── logs.jsonl     # JSON Lines file containing voter 0's results
+│   │   │   └── errors.jsonl   # JSON Lines file containing voter 0's errors
 │   │   ├── voter_1/           
-│   │   │   └── logs.jsonl     
+│   │   │   ├── logs.jsonl     
+│   │   │   └── errors.jsonl   # JSON Lines file containing voter 1's errors
 │   │   └── ...
 │   └── scripts/               # Contains execution scripts (slurm or local)
 │       ├── run_slurm_job_aggregate.sh    # Script to aggregate results from all voters
@@ -134,7 +136,40 @@ The launcher will create an evaluation folder named `run_eval` containing logs, 
 
 The `launcher.py` file will automatically create and run the scripts inside `./run_eval/scripts`. For majority voting, we run multiple voters in parallel using `evaluator.py` (via `run_slurm_job_eval_i.sh`) and then perform aggregation using `aggregator.py` (via `run_slurm_job_aggregate.sh`) to obtain the majority voted response.
 
-
+[UPDATE-2025-05] Added `errors.jsonl` in each result folder.
+Below is an example of an `errors.jsonl` object. For each error, it stores the context (a few lines before the error) and the corresponding correct target lines to help identify where the model's execution trace diverges from the expected output. The full model response, input prompt, and ground-truth trace can be found in `logs.jsonl` with the `id`. 
+```
+{
+  "id": "596a3893-5a38-3f21-936f-b0cc50e583e0",
+  "tgt_trace_lines": [
+    "L37,cond_v:True",
+    "L33,",
+    "L34,f:4",
+    "L35,lst_x:[4,4,1,5,1]",
+    "L36,cnter_0:8",
+    "L37,cond_v:True",
+    "L33,",
+    "L34,f:4",
+    "L35,lst_x:[4,4,1,5]",
+    "L36,cnter_0:10",
+    "L37,cond_v:False"
+  ],
+  "model_trace_lines": [
+    "L37,cond_v:True",
+    "L33,",
+    "L34,f:4",
+    "L35,lst_x:[4,4,1,5,1]",
+    "L36,cnter_0:8",
+    "L37,cond_v:True",
+    "L33,",
+    "L34,f:4",
+    "L35,lst_x:[4,4,1,5]",
+    "L36,cnter_0:10",
+    "L37,cond_v:True"
+  ],
+  "program": "def function(y, t, w, r, p, q, x, lst_u, lst_w, lst_x, lst_v, cond_t, cond_p, cond_y):\n\tlst_w.append(p)\n\tcond_l = 7 == 8\n\tw = r\n\tif cond_p: \n\t\ti = q + 9\n\te = lst_w[y]\n\tcond_j = 9 == 8\n\tif cond_j: \n\t\ts = lst_u[q]\n\tif cond_t: \n\t\tlst_x.append(1)\n\tif cond_y: \n\t\th = lst_w[2]\n\tcond_t = 4 == 1\n\tcnter_0 = 0 \n\tcond_o = cnter_0 != 30 \n\twhile cond_o: \n\t\tlst_u.append(t)\n\t\tcnter_0 = cnter_0 + 2 \n\t\tcond_o = cnter_0 != 30 \n\tif cond_t: \n\t\tlst_u.pop()\n\tlst_w.append(w)\n\tcnter_0 = 0 \n\tcond_v = cnter_0 != 28 \n\twhile cond_v: \n\t\tlst_u.pop()\n\t\tcnter_0 = cnter_0 + 2 \n\t\tcond_v = cnter_0 != 28 \n\tcnter_0 = 0 \n\tcond_v = cnter_0 != 10 \n\twhile cond_v: \n\t\tf = r\n\t\tlst_x.pop()\n\t\tcnter_0 = cnter_0 + 2 \n\t\tcond_v = cnter_0 != 10 \n\tif cond_l: \n\t\tf = 4\n\tlst_w.append(h)\n\tc = lst_v[1]\n\tcnter_0 = 0 \n\tcond_g = cnter_0 != 26 \n\twhile cond_g: \n\t\tcond_p = 1 != e\n\t\tcond_u = 2 != x\n\t\tcnter_0 = cnter_0 + 2 \n\t\tcond_g = cnter_0 != 26 \n\tlst_x.pop()\n\tcnter_0 = 0 \n\tcond_l = cnter_0 != 48 \n\twhile cond_l: \n\t\tcond_c = i == 2\n\t\tcnter_0 = cnter_0 + 2 \n\t\tcond_l = cnter_0 != 48 \n\tlst_x.pop()\n\tw = h\n\tlst_w.pop()\n\treturn"
+}
+```
 
 ## License
 

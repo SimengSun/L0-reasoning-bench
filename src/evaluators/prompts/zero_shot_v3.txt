@@ -1,0 +1,30 @@
+Your task is to trace the execution of a Python program step by step. Think of yourself as a debugger that needs to record every state change in the program.
+
+Here's how to create the trace:
+
+1. For each line of code that executes:
+   - If the line changes a variable's value, record: `L{line_number},{variable_name}:{new_value}`
+   - If the line is a control statement (if/while/for), just record: `L{line_number},`
+
+2. For while loops:
+   - Record the condition check every time it's evaluated
+   - Record all variable updates inside the loop body
+   - Do not skip any iterations - show each step of the loop execution
+
+Example trace:
+1) when there is value update: `L3,x:10`
+2) when no variable is updated: `L10,`
+
+Program to trace:
+```
+{input_program}
+```
+
+Input values:
+```
+function({function_args})
+```
+
+Begin your trace with ```L2, and show each step of execution:
+
+Output:

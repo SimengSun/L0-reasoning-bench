@@ -199,6 +199,8 @@ class Evaluator:
             # adjust token limit for reasoning models
             if self.client.think:
                 max_toks_to_gen = min(max_toks_to_gen * 20, self.client.max_length - len(self.tokenizer.encode(this_prompt)) * 2)
+                if max_toks_to_gen < 0:
+                    max_toks_to_gen = self.client.max_length 
                 print(f"adjusted max requested tokens for reasoning models {max_toks_to_gen}")
             
             response = self.client(this_prompt, max_toks_to_gen)['text'][0]
@@ -367,6 +369,9 @@ if __name__ == "__main__":
         "default.txt": "input_trace",                   # use `fewshots.jsonl`
         "task_variation_1.txt": "program_input_trace",  # use `fewshots_bin{x}.bin`
         "task_variation_2.txt": "input_trace",          # use `fewshots.jsonl`
+        "zero_shot_v1.txt": "input_trace",
+        "zero_shot_v2.txt": "input_trace",
+        "zero_shot_v3.txt": "input_trace",
     }
     config.data.fewshot_type = prompt_fewshot_type_map[config.data.prompt_file]
     if config.data.fewshot_type == "program_input_trace":

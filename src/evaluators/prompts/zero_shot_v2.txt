@@ -1,0 +1,41 @@
+Program Execution Trace Specification
+===================================
+
+Trace Format Definition:
+-----------------------
+Each trace entry must conform to the following specification:
+- Syntax: `L{line_number},{variable_name}:{value}`
+- Line numbers must be prefixed with 'L'
+- Variable updates must be separated by commas
+- Values must be separated from variables by colons
+
+Trace Rules:
+-----------
+1. Variable Assignment Traces:
+   - Required for all variable modifications
+   - Must include line number, variable name, and new value
+   - Example: `L2,x:5`
+
+2. Control Flow Traces:
+   - Required for if, while, for statements
+   - Format: `L{line_number},`
+   - Example: `L3,`
+
+3. Loop Execution Requirements:
+   - While loops must be fully expanded
+   - Each iteration must be explicitly traced
+   - Condition evaluation must be recorded
+   - All variable modifications must be recorded
+   - No iteration may be omitted
+
+Program to Trace:
+```
+{input_program}
+```
+
+Input Values:
+```
+function({function_args})
+```
+
+Trace Output (beginning with ```L2,):

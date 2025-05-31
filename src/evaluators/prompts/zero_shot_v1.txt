@@ -1,0 +1,16 @@
+Please execute the following program by outputting a trace of the program execution. The trace should include the line number, the variable name and the updated value of the variable after executing that line. Concretely, the trace should be of the format:
+`line_number,variable_name:updated_variable_value`, where the `line_number` is the line number such as `L2`, `L3`. The `variable_name` is the name of the variable which gets updated at the executed line of code. The `updated_variable_value` is the value of the variable after updating the executed line of code. If there is no variable getting updated at a line of code (e.g., `if condition:`, `while condition:`), only print the line number (e.g., "L10,").
+
+Program:
+```
+{input_program}
+```
+
+Input:
+```
+function({function_args})
+```
+
+Please follow the format above and provide the program execution trace starting with ```L2,
+
+Output:
